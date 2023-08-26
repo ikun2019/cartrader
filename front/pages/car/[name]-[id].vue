@@ -1,36 +1,39 @@
+<script setup>
+const route = useRoute();
+const { cars } = useCars();
+const { toTitleCase } = useUtilities();
+useHead({
+  title: toTitleCase(route.params.name),
+});
+
+definePageMeta({
+  validate({ params }) {
+    const { cars } = useCars();
+    const car = cars.find((c) => c.id === parseInt(params.id));
+    if (!car) {
+      throw createError({
+        statusCode: 404,
+        message: `Car with ID of ${route.params.id} does not exist`,
+      });
+    }
+  },
+});
+
+const car = computed(() => {
+  return cars.find((c) => {
+    return c.id === parseInt(route.params.id);
+  });
+});
+
+definePageMeta({
+  layout: "custom",
+});
+</script>
 <template>
-  <div v-if="car">
-    <!-- CAR DETAIL PAGE -->
+  <div>
     <CarDetailHero :car="car" />
     <CarDetailAttributes :features="car.features" />
     <CarDetailDescription :description="car.description" />
     <CarDetailContact />
-    <!-- CAR DETAIL PAGE   -->
   </div>
 </template>
-
-<script setup>
-const route = useRoute();
-const { cars } = useCars();
-console.log('useRoute =>', route);
-useHead({
-  title: route.params.name
-})
-
-const car = computed(() => {
-  return cars.find((c) => {
-    return c.id === parseInt(route.params.id)
-  })
-})
-
-if (!car.value) {
-  throw createError({
-    statusCode: 404,
-    message: `Car with id of ${route.params.id} does not exist.`
-  })
-}
-
-definePageMeta({
-  layout: 'custom'
-})
-</script>
